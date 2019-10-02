@@ -8,6 +8,29 @@
 
 import UIKit
 
+extension UIViewController {
+    
+    open func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, pushing: Bool, completion: (() -> Void)? = nil) {
+        
+        if pushing {
+            
+            let transition = CATransition()
+            transition.duration = 0.5
+            transition.type = CATransitionType.push
+            transition.subtype = CATransitionSubtype.fromRight
+            transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            view.window?.layer.add(transition, forKey: kCATransition)
+            viewControllerToPresent.modalPresentationStyle = .fullScreen
+            self.present(viewControllerToPresent, animated: false, completion: completion)
+            
+        } else {
+            self.present(viewControllerToPresent, animated: flag, completion: completion)
+        }
+        
+    }
+    
+}
+
 class MainViewController: UIViewController {
     
     var presentedVC: UIViewController?
@@ -17,27 +40,20 @@ class MainViewController: UIViewController {
     }
     
     @IBAction func didTapPresent(_ sender: Any) {
-        let transition = CATransition()
-        transition.duration = 0.3
-        transition.type = kCATransitionPush
-        transition.subtype = kCATransitionFromRight
-        transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        view.window!.layer.add(transition, forKey: kCATransition)
-
         let presentedVC = self.storyboard!.instantiateViewController(withIdentifier: "PresentedViewController")
         presentedVC.view.backgroundColor = UIColor.green
         presentedVC.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Close", style: .done, target: self, action: #selector(didTapCloseButton(_:)))
         let nvc = UINavigationController(rootViewController: presentedVC)
-        present(nvc, animated: false, completion: nil)
+        present(nvc, animated: false, pushing: true, completion: nil)
     }
     
     @objc func didTapCloseButton(_ sender: Any) {
         if let presentedVC = presentedViewController {
             let transition = CATransition()
-            transition.duration = 0.3
-            transition.type = kCATransitionPush
-            transition.subtype = kCATransitionFromLeft
-            transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+            transition.duration = 0.5
+            transition.type = CATransitionType.push
+            transition.subtype = CATransitionSubtype.fromLeft
+            transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
             presentedVC.view.window!.layer.add(transition, forKey: kCATransition)
         }
         
